@@ -6,7 +6,8 @@ import { signOut } from "next-auth/react";
 import { cn } from "@/lib/utils";
 import {
   LayoutDashboard, Users, GraduationCap, ShoppingBag,
-  Plane, Coins, Settings, LogOut, Sparkles, ChevronLeft, Menu
+  Plane, Coins, Settings, LogOut, Sparkles, ChevronLeft, Menu,
+  Search, Store, Link2, Mail
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
@@ -18,6 +19,10 @@ const links = [
   { href: "/admin/products", label: "Produtos", icon: ShoppingBag },
   { href: "/admin/trips", label: "Viagens", icon: Plane },
   { href: "/admin/points", label: "Pontos", icon: Coins },
+  { href: "/admin/flights", label: "Voos", icon: Search },
+  { href: "/admin/marketplace", label: "Marketplace", icon: Store },
+  { href: "/admin/affiliates", label: "Afiliados", icon: Link2 },
+  { href: "/admin/newsletters", label: "Newsletters", icon: Mail },
   { href: "/admin/settings", label: "Configurações", icon: Settings },
 ];
 

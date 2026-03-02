@@ -63,6 +63,8 @@ model User {
   orders         Order[]
   tripBookings   TripBooking[]
   subscription   Subscription?
+  flightAlerts   FlightAlert[]
+  milesListings  MilesListing[] @relation("MilesListingSeller")
 
   @@map("users")
 }
@@ -339,4 +341,223 @@ model PlatformSettings {
   updatedAt DateTime @updatedAt
 
   @@map("platform_settings")
+}
+
+// ==================== ALERTAS DE VOOS ====================
+
+model FlightAlert {
+  id            String   @id @default(cuid())
+  userId        String
+  origin        String
+  destination   String
+  departureDate DateTime?
+  returnDate    DateTime?
+  maxPrice      Float?
+  maxMiles      Int?
+  airline       String?
+  frequency     String   @default("daily") // realtime, daily, weekly
+  isActive      Boolean  @default(true)
+  lastChecked   DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  notifications AlertNotification[]
+
+  @@map("flight_alerts")
+}
+
+model AlertNotification {
+  id          String   @id @default(cuid())
+  alertId     String
+  channel     String   // email, whatsapp, push, sms
+  title       String
+  message     String   @db.Text
+  flightData  String?  @db.Text // JSON with flight details
+  isRead      Boolean  @default(false)
+  sentAt      DateTime @default(now())
+
+  alert FlightAlert @relation(fields: [alertId], references: [id], onDelete: Cascade)
+
+  @@map("alert_notifications")
+}
+
+// ==================== BUSCA DE VOOS ====================
+
+model FlightSearch {
+  id            String   @id @default(cuid())
+  userId        String?
+  origin        String
+  destination   String
+  departureDate DateTime
+  returnDate    DateTime?
+  passengers    Int      @default(1)
+  cabinClass    String   @default("economy") // economy, business, first
+  results       String?  @db.Text // JSON cached results
+  createdAt     DateTime @default(now())
+
+  @@map("flight_searches")
+}
+
+model SavedFlight {
+  id          String   @id @default(cuid())
+  userId      String
+  origin      String
+  destination String
+  airline     String
+  price       Float
+  miles       Int?
+  vpm         Float?   // valor por milha
+  departureAt DateTime
+  returnAt    DateTime?
+  flightData  String?  @db.Text // full JSON
+  createdAt   DateTime @default(now())
+
+  @@map("saved_flights")
+}
+
+model PriceHistory {
+  id          String   @id @default(cuid())
+  origin      String
+  destination String
+  airline     String?
+  price       Float
+  miles       Int?
+  cabinClass  String   @default("economy")
+  recordedAt  DateTime @default(now())
+
+  @@index([origin, destination, recordedAt])
+  @@map("price_history")
+}
+
+// ==================== MARKETPLACE DE MILHAS ====================
+
+enum MilesListingStatus {
+  ACTIVE
+  SOLD
+  CANCELLED
+  EXPIRED
+}
+
+model MilesListing {
+  id            String             @id @default(cuid())
+  sellerId      String
+  program       String             // ex: "LATAM Pass", "Smiles", "TudoAzul"
+  amount        Int                // quantidade de milhas
+  pricePerThousand Float           // preço por 1000 milhas
+  totalPrice    Float
+  minPurchase   Int                @default(1000)
+  expiresAt     DateTime?
+  status        MilesListingStatus @default(ACTIVE)
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+
+  seller        User               @relation("MilesListingSeller", fields: [sellerId], references: [id], onDelete: Cascade)
+  transactions  MilesTransaction[]
+
+  @@map("miles_listings")
+}
+
+model MilesTransaction {
+  id          String   @id @default(cuid())
+  listingId   String
+  buyerId     String
+  sellerId    String
+  amount      Int      // miles amount
+  totalPrice  Float
+  platformFee Float    // 5% fee
+  sellerPayout Float
+  status      String   @default("pending") // pending, escrow, completed, disputed, refunded
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  listing MilesListing @relation(fields: [listingId], references: [id])
+
+  @@map("miles_transactions")
+}
+
+// ==================== PROGRAMA DE AFILIADOS ====================
+
+model AffiliateLink {
+  id          String   @id @default(cuid())
+  userId      String
+  name        String
+  url         String
+  code        String   @unique
+  commission  Float    @default(0) // percentage
+  category    String?  // credit-card, miles-sale, course, etc.
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  clicks      AffiliateClick[]
+
+  @@map("affiliate_links")
+}
+
+model AffiliateClick {
+  id          String   @id @default(cuid())
+  linkId      String
+  ip          String?
+  userAgent   String?
+  referrer    String?
+  converted   Boolean  @default(false)
+  revenue     Float    @default(0)
+  createdAt   DateTime @default(now())
+
+  link AffiliateLink @relation(fields: [linkId], references: [id], onDelete: Cascade)
+
+  @@map("affiliate_clicks")
+}
+
+model AffiliateEarning {
+  id          String   @id @default(cuid())
+  userId      String
+  amount      Float
+  type        String   // click, sale, referral
+  description String
+  status      String   @default("pending") // pending, approved, paid
+  createdAt   DateTime @default(now())
+
+  @@map("affiliate_earnings")
+}
+
+// ==================== MONITOR DE MILHAS DO USUARIO ====================
+
+model UserMilesAccount {
+  id          String    @id @default(cuid())
+  userId      String
+  program     String    // LATAM Pass, Smiles, TudoAzul, etc.
+  balance     Int       @default(0)
+  expiresAt   DateTime?
+  lastUpdated DateTime  @default(now())
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([userId, program])
+  @@map("user_miles_accounts")
+}
+
+// ==================== NEWSLETTER ====================
+
+model Newsletter {
+  id          String   @id @default(cuid())
+  title       String
+  content     String   @db.Text
+  isPremium   Boolean  @default(false)
+  sentAt      DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("newsletters")
+}
+
+model NewsletterSubscriber {
+  id          String   @id @default(cuid())
+  email       String   @unique
+  userId      String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  @@map("newsletter_subscribers")
 }

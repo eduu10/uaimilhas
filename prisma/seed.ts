@@ -219,6 +219,172 @@ async function main() {
     },
   });
 
+  // Create flight alerts for test client
+  const alerts = await Promise.all([
+    prisma.flightAlert.create({
+      data: {
+        userId: client.id,
+        origin: "GRU",
+        destination: "GIG",
+        maxPrice: 500,
+        maxMiles: 15000,
+        airline: "LATAM",
+        frequency: "daily",
+      },
+    }),
+    prisma.flightAlert.create({
+      data: {
+        userId: client.id,
+        origin: "CNF",
+        destination: "SSA",
+        maxPrice: 800,
+        frequency: "weekly",
+      },
+    }),
+  ]);
+  console.log("Flight alerts created:", alerts.length);
+
+  // Create price history data
+  const now = new Date();
+  const priceHistoryData = [];
+  for (let i = 30; i >= 0; i--) {
+    const date = new Date(now);
+    date.setDate(date.getDate() - i);
+    priceHistoryData.push(
+      {
+        origin: "GRU",
+        destination: "GIG",
+        airline: "LATAM",
+        price: 350 + Math.random() * 200,
+        miles: 10000 + Math.floor(Math.random() * 8000),
+        cabinClass: "economy",
+        recordedAt: date,
+      },
+      {
+        origin: "GRU",
+        destination: "GIG",
+        airline: "GOL",
+        price: 300 + Math.random() * 180,
+        miles: 9000 + Math.floor(Math.random() * 7000),
+        cabinClass: "economy",
+        recordedAt: date,
+      }
+    );
+  }
+  await prisma.priceHistory.createMany({ data: priceHistoryData });
+  console.log("Price history created:", priceHistoryData.length, "records");
+
+  // Create miles accounts for test client
+  const milesAccounts = await Promise.all([
+    prisma.userMilesAccount.create({
+      data: {
+        userId: client.id,
+        program: "LATAM Pass",
+        balance: 45000,
+        expiresAt: new Date("2026-12-31"),
+      },
+    }),
+    prisma.userMilesAccount.create({
+      data: {
+        userId: client.id,
+        program: "Smiles",
+        balance: 22000,
+        expiresAt: new Date("2026-08-15"),
+      },
+    }),
+    prisma.userMilesAccount.create({
+      data: {
+        userId: client.id,
+        program: "TudoAzul",
+        balance: 8500,
+      },
+    }),
+  ]);
+  console.log("Miles accounts created:", milesAccounts.length);
+
+  // Create marketplace listings
+  const listings = await Promise.all([
+    prisma.milesListing.create({
+      data: {
+        sellerId: admin.id,
+        program: "LATAM Pass",
+        amount: 50000,
+        pricePerThousand: 22.50,
+        totalPrice: 1125,
+        minPurchase: 5000,
+        expiresAt: new Date("2026-06-30"),
+      },
+    }),
+    prisma.milesListing.create({
+      data: {
+        sellerId: admin.id,
+        program: "Smiles",
+        amount: 30000,
+        pricePerThousand: 18.00,
+        totalPrice: 540,
+        minPurchase: 1000,
+      },
+    }),
+    prisma.milesListing.create({
+      data: {
+        sellerId: client.id,
+        program: "TudoAzul",
+        amount: 15000,
+        pricePerThousand: 20.00,
+        totalPrice: 300,
+        minPurchase: 1000,
+      },
+    }),
+  ]);
+  console.log("Marketplace listings created:", listings.length);
+
+  // Create affiliate links
+  const affiliateLinks = await Promise.all([
+    prisma.affiliateLink.create({
+      data: {
+        userId: client.id,
+        name: "Cartão Nubank Ultravioleta",
+        url: "https://nubank.com.br/ultravioleta",
+        code: "uai-nub1",
+        commission: 15,
+        category: "cartao-credito",
+      },
+    }),
+    prisma.affiliateLink.create({
+      data: {
+        userId: client.id,
+        name: "Curso de Milhas Avançado",
+        url: "https://uaimilhas.com/cursos/avancado",
+        code: "uai-crs1",
+        commission: 30,
+        category: "curso",
+      },
+    }),
+  ]);
+  console.log("Affiliate links created:", affiliateLinks.length);
+
+  // Create newsletter subscribers
+  await prisma.newsletterSubscriber.createMany({
+    data: [
+      { email: "cliente@teste.com", userId: client.id },
+      { email: "user1@example.com" },
+      { email: "user2@example.com" },
+      { email: "user3@example.com" },
+    ],
+  });
+  console.log("Newsletter subscribers created: 4");
+
+  // Create a sample newsletter
+  await prisma.newsletter.create({
+    data: {
+      title: "Bem-vindo ao UAI Milhas!",
+      content: "Olá! Seja bem-vindo à nossa plataforma de milhas. Conheça nossos recursos: busca de voos, calculadora VPM, marketplace de milhas e muito mais!",
+      isPremium: false,
+      sentAt: new Date(),
+    },
+  });
+  console.log("Newsletter created");
+
   console.log("Seed completed!");
 }
 

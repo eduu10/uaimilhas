@@ -1,6 +1,7 @@
 import { Header } from "@/components/landing/header";
 import { Hero } from "@/components/landing/hero";
 import { Benefits } from "@/components/landing/benefits";
+import { FeaturesGrid } from "@/components/landing/features-grid";
 import { HowItWorks } from "@/components/landing/how-it-works";
 import { Showcase } from "@/components/landing/showcase";
 import { CoursesPreview } from "@/components/landing/courses-preview";
@@ -15,6 +16,7 @@ export default function Home() {
       <Header />
       <Hero />
       <Benefits />
+      <FeaturesGrid />
       <HowItWorks />
       <Showcase />
       <CoursesPreview />

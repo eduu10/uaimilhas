@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { GraduationCap, ShoppingBag, Plane, Clock } from "lucide-react";
+import { GraduationCap, ShoppingBag, Plane, Clock, Search, Bell, Calculator, Store } from "lucide-react";
 
 const benefits = [
   {
@@ -28,6 +28,30 @@ const benefits = [
     description: "Seus pontos são seus para sempre. Acumule no seu ritmo sem se preocupar com prazos.",
     gradient: "from-emerald-500 to-green-600",
   },
+  {
+    icon: Search,
+    title: "Busca de Voos Inteligente",
+    description: "Compare preços em reais e milhas com nosso buscador exclusivo.",
+    gradient: "from-indigo-500 to-violet-600",
+  },
+  {
+    icon: Bell,
+    title: "Alertas de Preço",
+    description: "Receba notificações quando os preços caírem nas rotas que você monitora.",
+    gradient: "from-rose-500 to-pink-600",
+  },
+  {
+    icon: Calculator,
+    title: "Calculadora VPM",
+    description: "Descubra se vale a pena usar milhas com nossa calculadora de Valor Por Milha.",
+    gradient: "from-teal-500 to-cyan-600",
+  },
+  {
+    icon: Store,
+    title: "Marketplace de Milhas",
+    description: "Compre e venda milhas com segurança em nosso marketplace com taxa de apenas 5%.",
+    gradient: "from-fuchsia-500 to-purple-600",
+  },
 ];
 
 export function Benefits() {
@@ -44,7 +68,7 @@ export function Benefits() {
             Por que escolher a <span className="text-gradient">UAI Milhas</span>?
           </h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            Descubra as vantagens exclusivas que fazem da nossa plataforma a melhor escolha para você.
+            Descubra as vantagens exclusivas e ferramentas inteligentes que fazem da nossa plataforma a melhor escolha para quem viaja com milhas.
           </p>
         </motion.div>
 

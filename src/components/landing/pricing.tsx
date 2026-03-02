@@ -4,49 +4,66 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Check, Sparkles } from "lucide-react";
+import { Check } from "lucide-react";
 import Link from "next/link";
 
 const plans = [
   {
-    name: "Basic",
-    price: 29.90,
-    points: 500,
+    name: "Gratuito",
+    price: 0,
     popular: false,
+    cta: "Começar Grátis",
     features: [
-      "500 pontos/mês",
-      "Acesso ao catálogo básico",
-      "1 curso gratuito/mês",
+      "Busca de voos limitada (5/dia)",
+      "Comparação básica de preços",
+      "Calculadora VPM simplificada",
+      "1 alerta de preço ativo",
       "Suporte por email",
     ],
   },
   {
     name: "Pro",
-    price: 79.90,
-    points: 2000,
+    price: 9.90,
     popular: true,
+    cta: "Assinar Pro",
     features: [
-      "2.000 pontos/mês",
-      "Acesso ao catálogo completo",
-      "5 cursos gratuitos/mês",
+      "Buscas de voos ilimitadas",
+      "Comparação completa BRL vs Milhas",
+      "Calculadora VPM avançada",
+      "Alertas de preço ilimitados",
+      "Notificações por e-mail e push",
+      "Histórico de preços de rotas",
       "Suporte prioritário",
-      "Bônus de 10% nos pontos",
-      "Acesso antecipado a ofertas",
     ],
   },
   {
     name: "Premium",
-    price: 149.90,
-    points: 5000,
+    price: 19.90,
     popular: false,
+    cta: "Assinar Premium",
     features: [
-      "5.000 pontos/mês",
-      "Acesso ilimitado a tudo",
-      "Todos os cursos inclusos",
+      "Tudo do plano Pro",
+      "Acesso ao Marketplace de Milhas",
+      "Planejador de viagem inteligente",
+      "Alertas prioritários (WhatsApp)",
+      "Monitor de saldos de milhas",
+      "Relatórios avançados",
       "Suporte VIP 24/7",
-      "Bônus de 25% nos pontos",
-      "Experiências exclusivas",
-      "Concierge pessoal",
+    ],
+  },
+  {
+    name: "Enterprise",
+    price: 99,
+    popular: false,
+    cta: "Falar com Vendas",
+    features: [
+      "Tudo do plano Premium",
+      "Acesso à API completa",
+      "Solução white-label",
+      "Suporte dedicado",
+      "Integrações customizadas",
+      "SLA garantido de 99,9%",
+      "Gerente de conta exclusivo",
     ],
   },
 ];
@@ -65,11 +82,11 @@ export function Pricing() {
             Escolha seu <span className="text-gradient">Plano</span>
           </h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            Planos flexíveis que se adaptam às suas necessidades. Quanto maior o plano, mais pontos e benefícios.
+            Planos flexíveis que se adaptam às suas necessidades. Comece grátis e evolua conforme sua demanda.
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
           {plans.map((plan, index) => (
             <motion.div
               key={plan.name}
@@ -88,14 +105,16 @@ export function Pricing() {
                 <CardHeader className="text-center pb-2">
                   <CardTitle className="text-xl">{plan.name}</CardTitle>
                   <div className="mt-4">
-                    <span className="text-4xl font-bold">R$ {plan.price.toFixed(2).replace(".", ",")}</span>
-                    <span className="text-muted-foreground">/mês</span>
-                  </div>
-                  <div className="flex items-center justify-center gap-1 mt-2">
-                    <Sparkles className="w-4 h-4 text-violet-500" />
-                    <span className="text-sm font-medium text-violet-600">
-                      {new Intl.NumberFormat("pt-BR").format(plan.points)} pontos/mês
-                    </span>
+                    {plan.price === 0 ? (
+                      <span className="text-4xl font-bold">Grátis</span>
+                    ) : (
+                      <>
+                        <span className="text-4xl font-bold">
+                          R$ {plan.price.toFixed(2).replace(".", ",")}
+                        </span>
+                        <span className="text-muted-foreground">/mês</span>
+                      </>
+                    )}
                   </div>
                 </CardHeader>
                 <CardContent className="pt-6">
@@ -112,7 +131,7 @@ export function Pricing() {
                       className={`w-full ${plan.popular ? "gradient-primary text-white" : ""}`}
                       variant={plan.popular ? "default" : "outline"}
                     >
-                      Assinar Agora
+                      {plan.cta}
                     </Button>
                   </Link>
                 </CardContent>
